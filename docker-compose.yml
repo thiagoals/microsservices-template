@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+
+  config-server:
+    container_name: microsservice-config-server
+    build: config-server/
+    ports:
+      - "8888:8888"
+    env_file: 
+      - github.env
+    environment:
+      - GITHUB_USER: ${GITHUB_USER}
+      - GITHUB_PASS: ${GITHUB_PASS}
+
+  #authentication:
+  #  container_name: microsservice-authentication
+  #  build: authentication/
+  #  ports:
+  #    - "8761:8761"
+  #  depends_on:
+  #    - config-server
