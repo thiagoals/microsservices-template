@@ -1,5 +1,9 @@
 version: "3.3"
 
+networks: 
+  microsservices-template:
+    name: microsservices-template
+
 services:
 
   config-server:
@@ -11,11 +15,62 @@ services:
         GITHUB_PASS: ${GITHUB_PASS}
     ports:
       - "8888:8888"
-    env_file: 
-      - github.env
     environment:
       - GITHUB_USER=${GITHUB_USER}
       - GITHUB_PASS=${GITHUB_PASS}
+    networks:
+      - microsservices-template
+
+  service-discovery:
+    container_name: microsservice-service-discovery
+    build:
+      context: service-discovery/
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    networks:
+      - microsservices-template
+  
+  user:
+    container_name: microsservice-user
+    build:
+      context: user/
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
+    depends_on:
+      - config-server
+      - service-discovery
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+    networks:
+      - microsservices-template
+    #command: docker run -p --network microsservices-template user:v1
+
+  authentication:
+    container_name: authentication
+    build:
+      context: authentication/
+    depends_on: 
+      - config-server
+      - service-discovery
+      - user
+    networks:
+      - microsservices-template
+  
+  gateway:
+    container_name: gateway
+    build:
+      context: gateway/
+    depends_on:
+      - config-server
+      - service-discovery
+      - user
+      - authentication
+    ports:
+      - "8765:8765"
+    networks:
+      - microsservices-template
 
   #authentication:
   #  container_name: microsservice-authentication
