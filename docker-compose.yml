@@ -38,11 +38,17 @@ services:
       context: user/
       args:
         ENVIRONMENT: ${ENVIRONMENT}
+        AUTH_EMAIL: ${AUTH_EMAIL}
+        AUTH_NAME: ${AUTH_NAME}
+        AUTH_PASS: ${AUTH_PASS}
     depends_on:
       - config-server
       - service-discovery
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
+      - AUTH_EMAIL=${AUTH_EMAIL}
+      - AUTH_NAME=${AUTH_NAME}
+      - AUTH_PASS=${AUTH_PASS}
     networks:
       - microsservices-template
     #command: docker run -p --network microsservices-template user:v1
